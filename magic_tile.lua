@@ -30,16 +30,16 @@ function tile_animate(available)
 end
 
 function magic_cursor_update() 
-    if btnp(⬆️) and magic_cursor.y>(max(map_start_y,player.y-50)) then
+    if btnp(⬆️) and magic_cursor.y>(max(map_start_y,player.y-player.vision_radius)) then
         magic_cursor.y-=8
     end
-    if btnp(⬇️) and magic_cursor.y<(max(map_start_y,player.y+50)) then
+    if btnp(⬇️) and magic_cursor.y<(max(map_start_y,player.y+player.vision_radius)) then
         magic_cursor.y+=8
     end
-    if btnp(⬅️) and magic_cursor.x>(max(map_start_x,player.x-50)) then
+    if btnp(⬅️) and magic_cursor.x>(max(map_start_x,player.x-player.vision_radius)) then
         magic_cursor.x-=8
     end
-    if btnp(➡️) and magic_cursor.x<(max(map_start_x,player.x+50)) then
+    if btnp(➡️) and magic_cursor.x<(max(map_start_x,player.x+player.vision_radius)) then
         magic_cursor.x+=8
     end
 end
