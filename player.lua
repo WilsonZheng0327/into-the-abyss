@@ -60,9 +60,24 @@ function player_update()
         end
     end
 
-
     player.x+=player.dx
     player.y+=player.dy
+
+    --check if glitched into a block fully
+    -- local cur_mx=(player.x-(player.x%8))/8
+    -- local cur_my=(player.y-(player.y%8))/8
+    -- if (fget(mget(cur_mx,cur_my), 0)
+    -- or fget(mget(cur_mx,cur_my), 1)) 
+    -- and player.dx!=0 and player.dy!=0 then
+    --     for x=cur_mx-1,cur_mx+1 do
+    --         for y=cur_my-1,cur_my+1 do
+    --             if not fget(mget(x,y),0)
+    --             and not fget(mget(x,y),1) then
+    --                 player.x=x*8 player.y=y*8
+    --             end
+    --         end
+    --     end
+    -- end
 
     if player.x<map_start_x then player.x=map_start_x end
     if player.x>map_end_x-player.w then player.x=map_end_x-player.w end

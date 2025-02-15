@@ -3,8 +3,9 @@ function _init()
 
     player = {
         sp = 2,
-        x = 32,
-        y = 8,
+        -- x = 32,
+        -- y = 8,
+        x=25*8,y=12*8,
         w = 8,
         h = 8,
         flp = false, --flipped
@@ -22,7 +23,17 @@ function _init()
         vision_radius = 32,
         tile_available = false,
         holding_tile = false,
+        has_layer2_key = false,
     }
+
+    -- save map data for fog effect
+    original_map = {}
+    for x=0,127 do
+        original_map[x] = {}
+        for y=0,33 do
+            original_map[x][y] = mget(x,y)
+        end
+    end
 
     game_objects = {}
 
@@ -34,7 +45,6 @@ function _init()
         w=4,
         h=4,
         anim=0,
-        visible=true,
     }
     add(game_objects, magic_tile_item)
 
@@ -44,15 +54,25 @@ function _init()
         x=0, --by tile not pixel
         y=0,
         placed=false,
-        orig_sp=0,
+        orig_sp=0, --for fog
     }
 
     magic_cursor = {
         sp=22,
         x=0,
         y=0,
-        visible=false,
     }
+
+    -- collectable key item for layer 3
+    key_item = {
+        sp=24,
+        x=28*8,
+        y=20*8,
+        w=8,
+        h=8,
+    }
+    original_map[key_item.x/8][key_item.y/8] = key_item.sp
+    add(game_objects, key_item)
 
     gravity = 0.7
     friction = 0.1
@@ -63,16 +83,7 @@ function _init()
     map_start_x=0
     map_end_x=1024
     map_start_y=0
-    map_end_y=512
-
-    -- save map data for fog effect
-    original_map = {}
-    for x=0,127 do
-        original_map[x] = {}
-        for y=0,31 do
-            original_map[x][y] = mget(x,y)
-        end
-    end
+    map_end_y=272
 
     --test
     x1r=0 y1r=0 x2r=0 y2r=0
@@ -86,18 +97,14 @@ function fog_update()
     for mx=px-8,px+16 do
         for my=py-8,py+16 do
             -- check map bounds
-            if mx >= 0 and mx < 128 and my >= 0 and my < 32 then
+            if mx >= 0 and mx < 128 and my >= 0 and my < 34  then
                 local dist = sqrt((mx*8-player.x)^2 + (my*8-player.y)^2)
                 
                 if dist <= player.vision_radius then
                     -- reveal tile
                     mset(mx, my, original_map[mx][my])
                 else
-                    -- hide tile with darkness (sprite 1)
-                    -- make sure not to hide collision tiles
-                    -- if not fget(original_map[mx][my], 0) and 
-                    --    not fget(original_map[mx][my], 1) then
-                    --    end
+                    -- hide tile with black
                     mset(mx, my, 16)
                 end
             end
@@ -109,11 +116,11 @@ end
 function _update()
     if not player.holding_tile then player_update() end
     player_animate()
-    fog_update()
+    -- fog_update()
     check_object_collisions()
     magic_tile_item_update()
     magic_tile_update()
-    
+    key_item_update()
 
     cam_x=player.x-64+(player.w/2)
     cam_y=player.y-64+(player.h/2)
@@ -124,7 +131,7 @@ function _update()
     camera(cam_x, cam_y)
 
     --debug
-    if btnp(⬆️) then print("WTF",cam_x,cam_y,7)end
+    if btnp(⬆️) then print("WTF",cam_x,cam_y,7) end
 end
 
 function _draw()
@@ -133,6 +140,7 @@ function _draw()
     spr(player.sp, player.x, player.y, 1, 1, player.flp)
     spr(magic_tile_item.sp, magic_tile_item.x, magic_tile_item.y, 1, 1)
     if player.tile_available then 
+        --indicator for having magic tile
         rect(cam_x+1,cam_y+2,cam_x+10,cam_y+11, 8)
         spr(18,cam_x+2,cam_y+2,1,1) 
     end
@@ -146,11 +154,28 @@ function _draw()
         print("❎ to place magic tile...",cam_x+4,cam_y+118,7)
     end
 
+    spr(key_item.sp,key_item.x,key_item.y,1,1)
+
     --test
     -- rect(x1r, y1r, x2r, y2r, 7)
-    -- print(tostr(player.tile_available), player.x-16,player.y,7)
+    -- print(tostr(player.has_layer2_key), player.x-16,player.y,7)
+    -- print(key_item.sp, player.x-16,player.y+8,7)
     -- if btnp(🅾️) then
     --     print("yoyo",cam_x,cam_y,7)
     -- end
 
+end
+
+function key_item_update()
+    if player.has_layer2_key then 
+        key_item.sp=16 
+        original_map[key_item.x/8][key_item.y/8] = key_item.sp
+        return 
+    end;
+
+    local dist = sqrt((key_item.x-player.x)^2 + (key_item.y-player.y)^2)
+    
+    if dist > player.vision_radius then
+        key_item.sp=16
+    end
 end
