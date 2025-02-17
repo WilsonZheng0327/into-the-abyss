@@ -5,25 +5,29 @@ function _init()
         sp = 2,
         -- x = 32,
         -- y = 8,
-        x=25*8,y=12*8,
-        w = 8,
-        h = 8,
-        flp = false, --flipped
-        dx = 0,
-        dy = 0,
-        max_dx = 10,
-        max_dy = 3,
-        acc = 2,
-        boost = 6.2, --y acceleration
-        anim = 0,
-        running = false,
-        jumping = false,
-        falling = false,
-        landed = false,
-        vision_radius = 32,
-        tile_available = false,
-        holding_tile = false,
-        has_layer2_key = false,
+        x=4*8,y=26*8,
+        w=8,
+        h=8,
+        flp=false, --flipped
+        dx=0,
+        dy=0,
+        max_dx=10,
+        max_dy=3,
+        acc=2,
+        boost=6.0, --y acceleration
+        anim=0,
+        running=false,
+        jumping=false,
+        falling=false,
+        landed=false,
+        vision_radius=32,
+        tile_available=false,
+        holding_tile=false,
+        has_layer2_key=true,
+        portal_opened=false,
+        on_portal=false,
+
+        dead=false,
     }
 
     -- save map data for fog effect
@@ -95,7 +99,7 @@ function fog_update()
     
     -- check tiles around player
     for mx=px-8,px+16 do
-        for my=py-8,py+16 do
+        for my=py-16,py+16 do
             -- check map bounds
             if mx >= 0 and mx < 128 and my >= 0 and my < 34  then
                 local dist = sqrt((mx*8-player.x)^2 + (my*8-player.y)^2)
@@ -116,10 +120,12 @@ end
 function _update()
     if not player.holding_tile then player_update() end
     player_animate()
-    -- fog_update()
+    fog_update()
     check_object_collisions()
     magic_tile_item_update()
-    magic_tile_update()
+    if not player.on_portal then
+        magic_tile_update()
+    end
     key_item_update()
 
     cam_x=player.x-64+(player.w/2)
@@ -150,15 +156,32 @@ function _draw()
         print("❎ to cancel",cam_x+74,cam_y+118,7)
         spr(magic_cursor.sp,magic_cursor.x,magic_cursor.y,1,1)
         magic_cursor_update()
-    elseif player.tile_available and not player.holding_tile then
+    elseif player.tile_available and not player.holding_tile 
+    and not player.on_portal then
         print("❎ to place magic tile...",cam_x+4,cam_y+118,7)
     end
 
+    if player.on_portal then
+        if not player.portal_opened then
+            print("❎ to activate portal...",cam_x+4,cam_y+118,7)
+        else
+            print("❎ to enter...",cam_x+4,cam_y+118,7)
+        end
+    end
+
     spr(key_item.sp,key_item.x,key_item.y,1,1)
+    if player.has_layer2_key then
+        --indicator for having layer 2 key
+        rect(cam_x+13,cam_y+2,cam_x+22,cam_y+11, 8)
+        spr(24,cam_x+14,cam_y+3,1,1) 
+    end
+
+    if player.dead then die() end
+
 
     --test
     -- rect(x1r, y1r, x2r, y2r, 7)
-    -- print(tostr(player.has_layer2_key), player.x-16,player.y,7)
+    -- print(tostr(player.portal_opened), player.x-16,player.y,7)
     -- print(key_item.sp, player.x-16,player.y+8,7)
     -- if btnp(🅾️) then
     --     print("yoyo",cam_x,cam_y,7)

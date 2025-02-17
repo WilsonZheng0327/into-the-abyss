@@ -60,6 +60,27 @@ function player_update()
         end
     end
 
+    -- check death block collision
+    if collide_all_directions(7) then
+        player.dead=true
+    end
+    
+    if collide_all_directions(6) then
+        player.on_portal=true
+        if not player.portal_opened then
+            if btnp(❎) then 
+                player.portal_opened=true
+                mset(4,25,34) mset(4,26,50) mset(5,25,35) mset(5,26,51)
+                original_map[4][25]=34
+                original_map[4][26]=50
+                original_map[5][25]=35
+                original_map[5][26]=51
+            end
+        else
+            if btnp(❎) then tp_to_layer_3() end
+        end
+    else player.on_portal=false end
+
     player.x+=player.dx
     player.y+=player.dy
 
@@ -106,4 +127,39 @@ end
 -- helper function
 function limit_speed(num, max)
     return mid(-max,num,max) 
+end
+
+-- helper function
+function collide_all_directions(flag)
+    return collide_map(player,"down",flag)
+    or collide_map(player,"up",flag)
+    or collide_map(player,"left",flag)
+    or collide_map(player,"right",flag)
+end
+
+function tp_to_layer_3()
+    cls(0)
+    for j=1,30 do flip() end
+    player.x=72*8 player.y=4*8
+end
+
+function die()
+    cls(0)
+    for j=1,10 do flip() end
+    local m1 = "wOAH..."
+    print(m1, cam_x+10, cam_y+50, 7)
+    for j=1,40 do flip() end
+    local m2 = "tHAT wAS a sCARY nIGHTMARE..."
+    print(m2, cam_x+10, cam_y+56, 7)
+    for j=1,50 do flip() end
+    local m3 = "lET'S nOT dO tHAT..."
+    print(m3, cam_x+10, cam_y+62, 7)
+    -- Pause to let player read
+    for i=1,60 do flip() end
+
+    player.x=56*8 player.y=28*8
+    player.dead=false
+    player.has_layer2_key=false
+    key_item.sp=24
+    original_map[key_item.x/8][key_item.y/8] = key_item.sp
 end
