@@ -66,7 +66,7 @@ function _init()
         x=0,
         y=0,
     }
-
+ 
     -- collectable key item for layer 3
     key_item = {
         sp=24,
