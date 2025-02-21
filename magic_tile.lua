@@ -37,6 +37,7 @@ end
 
 function magic_tile_update()
     if player.tile_available and btnp(❎) then 
+        if not player.holding_tile and (player.jumping or player.falling) and not player.has_crown then return end
         -- reset magic cursor location to player
         if not player.holding_tile then 
             magic_cursor.x=player.x-(player.x%8)

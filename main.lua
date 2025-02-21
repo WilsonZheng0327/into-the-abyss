@@ -3,9 +3,8 @@ function _init()
 
     player = {
         sp = 2,
-        -- x = 32,
-        -- y = 8,
-        x=4*8,y=26*8,
+        x=32, y=8,
+        x=57*8,y=27*8,
         w=8,
         h=8,
         flp=false, --flipped
@@ -21,9 +20,10 @@ function _init()
         falling=false,
         landed=false,
         vision_radius=32,
-        tile_available=false,
+        tile_available=true,
         holding_tile=false,
-        has_layer2_key=true,
+        has_crown=false,
+        has_layer2_key=false,
         portal_opened=false,
         on_portal=false,
 
@@ -67,6 +67,17 @@ function _init()
         y=0,
     }
  
+    -- collectable crown to unlock magic tile placement while jumping
+    crown_item = {
+        sp=25,
+        x=55*8,
+        y=30*8,
+        w=6,
+        h=6,
+    }
+    original_map[crown_item.x/8][crown_item.y/8] = crown_item.sp
+    add(game_objects, crown_item)
+
     -- collectable key item for layer 3
     key_item = {
         sp=24,
@@ -77,6 +88,7 @@ function _init()
     }
     original_map[key_item.x/8][key_item.y/8] = key_item.sp
     add(game_objects, key_item)
+
 
     gravity = 0.7
     friction = 0.1
@@ -126,7 +138,8 @@ function _update()
     if not player.on_portal then
         magic_tile_update()
     end
-    key_item_update()
+    item_update(key_item, player.has_layer2_key)
+    item_update(crown_item, player.has_crown)
 
     cam_x=player.x-64+(player.w/2)
     cam_y=player.y-64+(player.h/2)
@@ -169,11 +182,18 @@ function _draw()
         end
     end
 
+    spr(crown_item.sp,crown_item.x,crown_item.y,1,1)
+    if player.has_crown then
+        --indicator for having crown
+        rect(cam_x+13,cam_y+2,cam_x+22,cam_y+11, 8)
+        spr(25,cam_x+14,cam_y+3,1,1) 
+    end
+
     spr(key_item.sp,key_item.x,key_item.y,1,1)
     if player.has_layer2_key then
         --indicator for having layer 2 key
-        rect(cam_x+13,cam_y+2,cam_x+22,cam_y+11, 8)
-        spr(24,cam_x+14,cam_y+3,1,1) 
+        rect(cam_x+25,cam_y+2,cam_x+34,cam_y+11, 8)
+        spr(24,cam_x+26,cam_y+3,1,1) 
     end
 
     if player.dead then die() end
@@ -189,16 +209,16 @@ function _draw()
 
 end
 
-function key_item_update()
-    if player.has_layer2_key then 
-        key_item.sp=16 
-        original_map[key_item.x/8][key_item.y/8] = key_item.sp
+function item_update(item, boolean)
+    if boolean then 
+        item.sp=16 
+        original_map[item.x/8][item.y/8] = item.sp
         return 
     end;
 
-    local dist = sqrt((key_item.x-player.x)^2 + (key_item.y-player.y)^2)
+    local dist = sqrt((item.x-player.x)^2 + (item.y-player.y)^2)
     
     if dist > player.vision_radius then
-        key_item.sp=16
+        item.sp=16
     end
 end

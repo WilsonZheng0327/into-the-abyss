@@ -58,9 +58,10 @@ function check_object_collisions()
         if collide_object(player, object) then
             if object == magic_tile_item and not player.tile_available then 
                 player.tile_available=true
-            end
-            if object == key_item and not player.has_layer2_key then
+            elseif object == key_item and not player.has_layer2_key then
                 player.has_layer2_key=true
+            elseif object == crown_item and not player.has_crown then
+                player.has_crown=true
             end
         end
     end
