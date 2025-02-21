@@ -1,14 +1,5 @@
 function magic_tile_item_update()
     tile_animate(not player.tile_available)
-
-    if player.tile_available and btnp(❎) then 
-        -- reset magic cursor location to player
-        if not player.holding_tile then 
-            magic_cursor.x=player.x-(player.x%8)
-            magic_cursor.y=player.y-(player.y%8)
-        end
-        player.holding_tile = not player.holding_tile
-    end
 end
 
 function tile_animate(available)
@@ -45,6 +36,15 @@ function magic_cursor_update()
 end
 
 function magic_tile_update()
+    if player.tile_available and btnp(❎) then 
+        -- reset magic cursor location to player
+        if not player.holding_tile then 
+            magic_cursor.x=player.x-(player.x%8)
+            magic_cursor.y=player.y-(player.y%8)
+        end
+        player.holding_tile = not player.holding_tile
+    end
+
     if player.holding_tile and btnp(🅾️) then
         -- check placement not on player or map tile
         local orig_sp=mget(magic_cursor.x/8,magic_cursor.y/8)
