@@ -49,21 +49,34 @@ function magic_tile_update()
     if player.holding_tile and btnp(🅾️) then
         -- check placement not on player or map tile
         local orig_sp=mget(magic_cursor.x/8,magic_cursor.y/8)
-        if not fget(orig_sp,0)
-        and not fget(orig_sp,1) then
+
+        if (not fget(orig_sp,0) and not fget(orig_sp,1)) or fget(orig_sp,3) then
             -- reset original magic tile location (if exists)
             if magic_tile.placed then
                 mset(magic_tile.x,magic_tile.y,magic_tile.orig_sp)
-                original_map[magic_tile.x][magic_tile.y]=magic_tile.orig_sp --for fog
+                if not fget(orig_sp,3) then
+                    original_map[magic_tile.x][magic_tile.y]=magic_tile.orig_sp --for fog
+                else -- breakable tiles
+                    original_map[magic_tile.x][magic_tile.y]=16
+                end
             end
+
             -- place new magic tile
             magic_tile.x=magic_cursor.x/8
             magic_tile.y=magic_cursor.y/8
             player.holding_tile=false
             magic_tile.placed=true
-            magic_tile.orig_sp=orig_sp
+
+            if fget(mget(magic_tile.x,magic_tile.y),3) then
+                magic_tile.orig_sp=16
+            else magic_tile.orig_sp=orig_sp end
+
             mset(magic_tile.x,magic_tile.y,magic_tile.sp)
-            original_map[magic_tile.x][magic_tile.y]=magic_tile.sp --for fog
+            original_map[magic_tile.x][magic_tile.y]=magic_tile.sp --for fog  
+
+            if fget(mget(magic_tile.x,magic_tile.y),3) then
+                -- play sound effect?
+            end
         end
     end
 end

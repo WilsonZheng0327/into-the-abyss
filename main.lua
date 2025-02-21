@@ -3,8 +3,8 @@ function _init()
 
     player = {
         sp = 2,
-        x=32, y=8,
-        x=57*8,y=27*8,
+        -- x=32, y=8,
+        x=73*8,y=3*8,
         w=8,
         h=8,
         flp=false, --flipped
