@@ -26,6 +26,8 @@ function _init()
         has_layer2_key=false,
         portal_opened=false,
         on_portal=false,
+        on_switch=false,
+        in_trial=false,
 
         dead=false,
     }
@@ -44,10 +46,8 @@ function _init()
     -- collectable magic tile item
     magic_tile_item = {
         sp=18,
-        x=232,
-        y=96,
-        w=4,
-        h=4,
+        x=232,y=96,
+        w=4,h=4,
         anim=0,
     }
     add(game_objects, magic_tile_item)
@@ -55,25 +55,21 @@ function _init()
     -- placeable magic tile
     magic_tile = {
         sp=23,
-        x=0, --by tile not pixel
-        y=0,
+        x=0,y=0, -- by tile not pixel
         placed=false,
         orig_sp=0, --for fog
     }
 
     magic_cursor = {
         sp=22,
-        x=0,
-        y=0,
+        x=0,y=0,
     }
  
     -- collectable crown to unlock magic tile placement while jumping
     crown_item = {
         sp=25,
-        x=55*8,
-        y=30*8,
-        w=6,
-        h=6,
+        x=55*8,y=30*8,
+        w=6,h=6,
     }
     original_map[crown_item.x/8][crown_item.y/8] = crown_item.sp
     add(game_objects, crown_item)
@@ -81,14 +77,20 @@ function _init()
     -- collectable key item for layer 3
     key_item = {
         sp=24,
-        x=28*8,
-        y=20*8,
-        w=8,
-        h=8,
+        x=28*8,y=20*8,
+        w=8,h=8,
     }
     original_map[key_item.x/8][key_item.y/8] = key_item.sp
     add(game_objects, key_item)
 
+    -- trial switch in layer 3
+    switch_item = {
+        sp=152,
+        x=83*8,y=5*8,
+        w=8,h=8,
+    }
+    original_map[switch_item.x/8][switch_item.y/8] = switch_item.sp
+    add(game_objects, switch_item)
 
     gravity = 0.7
     friction = 0.1
@@ -135,7 +137,7 @@ function _update()
     fog_update()
     check_object_collisions()
     magic_tile_item_update()
-    if not player.on_portal then
+    if not player.on_portal and not player.on_switch then
         magic_tile_update()
     end
     item_update(key_item, player.has_layer2_key)
@@ -170,16 +172,22 @@ function _draw()
         spr(magic_cursor.sp,magic_cursor.x,magic_cursor.y,1,1)
         magic_cursor_update()
     elseif player.tile_available and not player.holding_tile 
-    and not player.on_portal then
+    and not player.on_portal and not player.on_switch then
         print("❎ to place magic tile...",cam_x+4,cam_y+118,7)
     end
 
     if player.on_portal then
-        if not player.portal_opened then
-            print("❎ to activate portal...",cam_x+4,cam_y+118,7)
-        else
-            print("❎ to enter...",cam_x+4,cam_y+118,7)
+        if player.has_layer2_key then
+            if not player.portal_opened then
+                print("❎ to activate portal...",cam_x+4,cam_y+118,7)
+            else
+                print("❎ to enter...",cam_x+4,cam_y+118,7)
+            end
         end
+    end
+
+    if player.on_switch and not player.in_trial then
+        print("❎ to open the door... beware...",cam_x+4,cam_y+118,7)
     end
 
     spr(crown_item.sp,crown_item.x,crown_item.y,1,1)

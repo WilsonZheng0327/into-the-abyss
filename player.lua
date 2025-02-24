@@ -81,24 +81,28 @@ function player_update()
         end
     else player.on_portal=false end
 
+    if collide_all_directions(5) then
+        player.on_switch=true
+        if not player.in_trial then
+            if btnp(❎) then
+                player.in_trial=true
+                mset(83,5,153)
+                original_map[83][5]=153
+                mset(85,2,157)
+                mset(85,3,158)
+                mset(85,4,158)
+                mset(85,5,158)
+                original_map[85][2]=157
+                original_map[85][3]=158
+                original_map[85][4]=158
+                original_map[85][5]=158
+                start_trial()
+            end
+        end
+    else player.on_switch=false end
+
     player.x+=player.dx
     player.y+=player.dy
-
-    --check if glitched into a block fully
-    -- local cur_mx=(player.x-(player.x%8))/8
-    -- local cur_my=(player.y-(player.y%8))/8
-    -- if (fget(mget(cur_mx,cur_my), 0)
-    -- or fget(mget(cur_mx,cur_my), 1)) 
-    -- and player.dx!=0 and player.dy!=0 then
-    --     for x=cur_mx-1,cur_mx+1 do
-    --         for y=cur_my-1,cur_my+1 do
-    --             if not fget(mget(x,y),0)
-    --             and not fget(mget(x,y),1) then
-    --                 player.x=x*8 player.y=y*8
-    --             end
-    --         end
-    --     end
-    -- end
 
     if player.x<map_start_x then player.x=map_start_x end
     if player.x>map_end_x-player.w then player.x=map_end_x-player.w end
@@ -140,7 +144,8 @@ end
 function tp_to_layer_3()
     cls(0)
     for j=1,30 do flip() end
-    player.x=72*8 player.y=4*8
+    player.x=74*8 player.y=4*8
+    player.has_layer2_key=false
 end
 
 function die()
@@ -157,9 +162,33 @@ function die()
     -- Pause to let player read
     for i=1,60 do flip() end
 
-    player.x=56*8 player.y=28*8
-    player.dead=false
-    player.has_layer2_key=false
-    key_item.sp=24
-    original_map[key_item.x/8][key_item.y/8] = key_item.sp
+    if not player.in_trial then
+        player.x=56*8 player.y=28*8
+        player.dead=false
+        player.has_layer2_key=false
+        key_item.sp=24
+        original_map[key_item.x/8][key_item.y/8] = key_item.sp
+    else 
+        player.x=74*8 player.y=5*8
+        player.dead=false
+        player.in_trial=false
+
+        reset_trial()
+    end
+end
+
+function start_trial()
+end
+
+function reset_trial()
+    mset(83,5,152)
+    original_map[83][5]=152
+    mset(85,2,154)
+    mset(85,3,156)
+    mset(85,4,155)
+    mset(85,5,156)
+    original_map[85][2]=154
+    original_map[85][3]=156
+    original_map[85][4]=155
+    original_map[85][5]=156
 end
