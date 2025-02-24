@@ -176,19 +176,3 @@ function die()
         reset_trial()
     end
 end
-
-function start_trial()
-end
-
-function reset_trial()
-    mset(83,5,152)
-    original_map[83][5]=152
-    mset(85,2,154)
-    mset(85,3,156)
-    mset(85,4,155)
-    mset(85,5,156)
-    original_map[85][2]=154
-    original_map[85][3]=156
-    original_map[85][4]=155
-    original_map[85][5]=156
-end

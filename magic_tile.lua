@@ -50,6 +50,7 @@ function magic_tile_update()
         -- check placement not on player or map tile
         local orig_sp=mget(magic_cursor.x/8,magic_cursor.y/8)
 
+        if magic_cursor.x/8 == flr(player.x/8) and magic_cursor.y/8 == flr(player.y/8) then return end
         if (not fget(orig_sp,0) and not fget(orig_sp,1)) or fget(orig_sp,3) then
             -- reset original magic tile location (if exists)
             if magic_tile.placed then

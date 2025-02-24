@@ -38,6 +38,13 @@ function _init()
         original_map[x] = {}
         for y=0,33 do
             original_map[x][y] = mget(x,y)
+
+            -- save arrow tiles
+            if mget(x,y)==arr_tile_sp then
+                add(arrow_tiles, {
+                    x=x,y=y,
+                    last_shot=0
+                })
         end
     end
 
@@ -92,6 +99,19 @@ function _init()
     original_map[switch_item.x/8][switch_item.y/8] = switch_item.sp
     add(game_objects, switch_item)
 
+    -- animation state for trial filling
+    trial_animation = {
+        active = false,
+        current_column = 80,
+        last_update = 0,
+        column_delay = 1.5, -- seconds between columns
+    }
+
+    arrows={}
+    arrow_tiles={}
+    arr_tile_sp=192
+    arr_sp=193
+
     gravity = 0.7
     friction = 0.1
 
@@ -132,6 +152,7 @@ end
 
 --update and draw
 function _update()
+    trial_animation_update()
     if not player.holding_tile then player_update() end
     player_animate()
     fog_update()
@@ -202,6 +223,14 @@ function _draw()
         --indicator for having layer 2 key
         rect(cam_x+25,cam_y+2,cam_x+34,cam_y+11, 8)
         spr(24,cam_x+26,cam_y+3,1,1) 
+    end
+
+    if trial_animation.active then
+        print("TRIAL ACTIVATING...", cam_x+4, cam_y+110, 8)
+        -- Visual progress bar
+        rect(cam_x+4, cam_y+100, cam_x+124, cam_y+106, 5)
+        local progress = (trial_animation.current_column - 80) / 48
+        rectfill(cam_x+4, cam_y+100, cam_x+4+progress*120, cam_y+106, 8)
     end
 
     if player.dead then die() end
