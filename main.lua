@@ -1,10 +1,12 @@
 --variables
 function _init()
 
+    music(0, 1000, 0)
+
     player = {
         sp = 2,
-        -- x=32, y=8,
-        x=73*8,y=3*8,
+        x=32, y=8,
+        -- x=96*8,y=26*8,
         w=8,
         h=8,
         flp=false, --flipped
@@ -20,7 +22,7 @@ function _init()
         falling=false,
         landed=false,
         vision_radius=32,
-        tile_available=true,
+        tile_available=false,
         holding_tile=false,
         has_crown=false,
         has_layer2_key=false,
@@ -28,9 +30,19 @@ function _init()
         on_portal=false,
         on_switch=false,
         in_trial=false,
+        trial_finished=false,
 
         dead=false,
+        win=false,
+        in_win_screen=false
     }
+    
+    arrows={}
+    arrow_tiles={}
+    arr_tile_sp=192
+    arr_sp=193
+    arr_tile_count = 0
+
 
     -- save map data for fog effect
     original_map = {}
@@ -41,10 +53,11 @@ function _init()
 
             -- save arrow tiles
             if mget(x,y)==arr_tile_sp then
+                arr_tile_count+=1
                 add(arrow_tiles, {
                     x=x,y=y,
                     last_shot=0
-                })
+                }) end
         end
     end
 
@@ -104,13 +117,8 @@ function _init()
         active = false,
         current_column = 80,
         last_update = 0,
-        column_delay = 1.5, -- seconds between columns
+        column_delay = 100, -- seconds between columns
     }
-
-    arrows={}
-    arrow_tiles={}
-    arr_tile_sp=192
-    arr_sp=193
 
     gravity = 0.7
     friction = 0.1
@@ -152,17 +160,38 @@ end
 
 --update and draw
 function _update()
+    if player.in_win_screen then
+        if btnp(❎) then
+            player.in_win_screen = false
+            player.tile_available = false
+            player.has_crown = false
+            player.has_layer2_key = false
+            player.portal_opened = false
+            player.trial_finished = false
+            player.x = 32
+            player.y = 8
+            crown_item.sp=25
+            original_map[crown_item.x/8][crown_item.y/8] = crown_item.sp
+        end
+        return
+    end
+
     trial_animation_update()
-    if not player.holding_tile then player_update() end
+    if not player.holding_tile then 
+        player_update() 
+        if not player.trial_finished then arrow_update() end
+    end
     player_animate()
     fog_update()
     check_object_collisions()
     magic_tile_item_update()
-    if not player.on_portal and not player.on_switch then
+    if not player.on_portal and not player.on_switch 
+    and not player.trial_finished then
         magic_tile_update()
     end
     item_update(key_item, player.has_layer2_key)
     item_update(crown_item, player.has_crown)
+    
 
     cam_x=player.x-64+(player.w/2)
     cam_y=player.y-64+(player.h/2)
@@ -172,13 +201,15 @@ function _update()
     if cam_y>map_end_y-128 then cam_y=map_end_y-128 end
     camera(cam_x, cam_y)
 
-    --debug
-    if btnp(⬆️) then print("WTF",cam_x,cam_y,7) end
 end
 
 function _draw()
+    if player.in_win_screen then return end
+
     cls()
     map(0, 0)
+
+    if not player.trial_finished then arrow_draw() end
     spr(player.sp, player.x, player.y, 1, 1, player.flp)
     spr(magic_tile_item.sp, magic_tile_item.x, magic_tile_item.y, 1, 1)
     if player.tile_available then 
@@ -193,7 +224,8 @@ function _draw()
         spr(magic_cursor.sp,magic_cursor.x,magic_cursor.y,1,1)
         magic_cursor_update()
     elseif player.tile_available and not player.holding_tile 
-    and not player.on_portal and not player.on_switch then
+    and not player.on_portal and not player.on_switch 
+    and not player.trial_finished then
         print("❎ to place magic tile...",cam_x+4,cam_y+118,7)
     end
 
@@ -243,6 +275,7 @@ function _draw()
     -- if btnp(🅾️) then
     --     print("yoyo",cam_x,cam_y,7)
     -- end
+    -- print(arr_tile_count, cam_x,cam_y,7)
 
 end
 

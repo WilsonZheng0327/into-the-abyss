@@ -21,28 +21,29 @@ function tile_animate(available)
 end
 
 function magic_cursor_update() 
-    if btnp(⬆️) and magic_cursor.y>(max(map_start_y,player.y-player.vision_radius)) then
+    if btnp(⬆️) and magic_cursor.y>(max(map_start_y,player.y-player.vision_radius+8)) then
         magic_cursor.y-=8
     end
-    if btnp(⬇️) and magic_cursor.y<(max(map_start_y,player.y+player.vision_radius)) then
+    if btnp(⬇️) and magic_cursor.y<(max(map_start_y,player.y+player.vision_radius-8)) then
         magic_cursor.y+=8
     end
-    if btnp(⬅️) and magic_cursor.x>(max(map_start_x,player.x-player.vision_radius)) then
+    if btnp(⬅️) and magic_cursor.x>(max(map_start_x,player.x-player.vision_radius+8)) then
         magic_cursor.x-=8
     end
-    if btnp(➡️) and magic_cursor.x<(max(map_start_x,player.x+player.vision_radius)) then
+    if btnp(➡️) and magic_cursor.x<(max(map_start_x,player.x+player.vision_radius-8)) then
         magic_cursor.x+=8
     end
 end
 
 function magic_tile_update()
     if player.tile_available and btnp(❎) then 
-        if not player.holding_tile and (player.jumping or player.falling) and not player.has_crown then return end
+        if not player.holding_tile and (player.jumping or player.falling) and not player.has_crown then sfx(17) return end
         -- reset magic cursor location to player
         if not player.holding_tile then 
             magic_cursor.x=player.x-(player.x%8)
             magic_cursor.y=player.y-(player.y%8)
-        end
+            sfx(14)
+        else sfx(16) end
         player.holding_tile = not player.holding_tile
     end
 
@@ -50,7 +51,7 @@ function magic_tile_update()
         -- check placement not on player or map tile
         local orig_sp=mget(magic_cursor.x/8,magic_cursor.y/8)
 
-        if magic_cursor.x/8 == flr(player.x/8) and magic_cursor.y/8 == flr(player.y/8) then return end
+        if magic_cursor.x/8 == flr(player.x/8) and magic_cursor.y/8 == flr(player.y/8) then sfx(17) return end
         if (not fget(orig_sp,0) and not fget(orig_sp,1)) or fget(orig_sp,3) then
             -- reset original magic tile location (if exists)
             if magic_tile.placed then
@@ -67,6 +68,7 @@ function magic_tile_update()
             magic_tile.y=magic_cursor.y/8
             player.holding_tile=false
             magic_tile.placed=true
+            sfx(15)
 
             if fget(mget(magic_tile.x,magic_tile.y),3) then
                 magic_tile.orig_sp=16

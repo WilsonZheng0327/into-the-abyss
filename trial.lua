@@ -15,6 +15,8 @@ function start_trial()
     
     fill_trial_column(trial_animation.current_column)
     trial_animation.current_column += 1
+
+    player.vision_radius = 48
 end
 
 function trial_animation_update()
@@ -50,7 +52,7 @@ function reset_trial()
             original_map[i][j] = original_map_backup[i][j]
         end
     end
-    
+    player.vision_radius = 32
     mset(83, 5, 152)
     original_map[83][5] = 152
     mset(85, 2, 154)
@@ -69,9 +71,9 @@ function create_arrow(tile)
     local arrow = {
         x=tile.x*8+4,
         y=tile.y*8+8,
-        w=6, h=6,
+        w=2, h=6,
         dy=2,
-        sp = arrow_sp,
+        sp = arr_sp,
         active = true
     }
     add(arrows, arrow)
@@ -81,12 +83,16 @@ function arrow_update()
     local current_time = time()
     
     for tile in all(arrow_tiles) do
+        local interval=0
+        if tile.x==98 then interval = 0.2
+        else interval = 1 end
+
         local tile_x = tile.x * 8
         local tile_y = tile.y * 8
         
         local dist = sqrt((tile_x-player.x)^2 + (tile_y-player.y)^2)
         if dist <= player.vision_radius then
-            if current_time - tile.last_shot > 1 then
+            if current_time - tile.last_shot > interval then
                 create_arrow(tile)
                 tile.last_shot = current_time
             end
@@ -118,6 +124,15 @@ function arrow_update()
     for i=#arrows,1,-1 do
         if not arrows[i].active then
             deli(arrows, i)
+        end
+    end
+end
+
+function arrow_draw()
+    for arrow in all(arrows) do
+        if arrow.active then
+            -- Only draw if within the visible screen area
+            spr(arrow.sp, arrow.x-4, arrow.y-4, 1, 1)  -- -4 to center sprite
         end
     end
 end

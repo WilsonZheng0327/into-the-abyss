@@ -23,6 +23,7 @@ function player_update()
     if btnp(⬆️) and player.landed then
         player.dy-=player.boost
         player.landed=false
+        sfx(12)
     end
 
     --check collision
@@ -61,7 +62,7 @@ function player_update()
     end
 
     -- check death block collision
-    if collide_all_directions(7) then
+    if collide_all_directions(7) and not collide_all_directions(3) then
         player.dead=true
     end
     
@@ -77,7 +78,7 @@ function player_update()
                 original_map[5][26]=51
             end
         else
-            if btnp(❎) then tp_to_layer_3() end
+            if btnp(❎) and player.x < 72*8 then tp_to_layer_3() end
         end
     else player.on_portal=false end
 
@@ -100,6 +101,18 @@ function player_update()
             end
         end
     else player.on_switch=false end
+
+    if collide_all_directions(4) then
+        reset_trial()
+        player.trial_finished=true
+        cls(0)
+        for j=1,30 do flip() end
+        player.x=87*8 player.y=11*8
+    end
+
+    if collide_all_directions(3) and collide_all_directions(7) then
+        win()
+    end
 
     player.x+=player.dx
     player.y+=player.dy
@@ -149,6 +162,7 @@ function tp_to_layer_3()
 end
 
 function die()
+    music(-1)
     cls(0)
     for j=1,10 do flip() end
     local m1 = "wOAH..."
@@ -175,4 +189,46 @@ function die()
 
         reset_trial()
     end
+    music(0, 1000, 0)
+end
+
+function win()
+    cls(0)
+    for j=1,30 do flip() end
+    local m1 = "tHE oNE pIECE OF tREASURE"
+    print(m1, cam_x+4, cam_y+44, 7)
+    local m2 = "eVERYONE wANTED..."
+    print(m2, cam_x+58, cam_y+50, 7)
+    for j=1,60 do flip() end
+    local m3 = "bUT aT wHAT cOST...?"
+    print(m3, cam_x+4, cam_y+62, 7)
+    for j=1,60 do flip() end
+    local m4 = "iT iS nOW yOUR tURN"
+    print(m4, cam_x+4, cam_y+74, 7)
+    local m5 = "tO pROTECT iT..."
+    print(m5, cam_x+60, cam_y+80, 7)
+    for j=1,60 do flip() end
+
+    local m6 = "uNTIL tHE dAY yOU dIE..."
+    local displayed = ""
+    for i=1, #m6-3 do
+        local char = sub(m6, i, i)
+        displayed = displayed .. char
+    
+        print(displayed, cam_x+4, cam_y+110, 7)
+        for j=1,10 do flip() end
+    end
+    for j=1,20 do flip() end
+    for i=#m6-2, #m6 do
+        local char = sub(m6, i, i)
+        displayed = displayed .. char
+    
+        print(displayed, cam_x+4, cam_y+110, 7)
+        for j=1,20 do flip() end
+    end
+    
+    for j=1,60 do flip() end
+    print("❎ TO RESTART...",cam_x+66,cam_y+118,7)
+    
+    player.in_win_screen=true
 end
