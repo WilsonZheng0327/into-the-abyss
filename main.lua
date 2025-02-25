@@ -117,7 +117,7 @@ function _init()
         active = false,
         current_column = 80,
         last_update = 0,
-        column_delay = 100, -- seconds between columns
+        column_delay = 1.5, -- seconds between columns
     }
 
     gravity = 0.7
