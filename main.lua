@@ -1,7 +1,7 @@
 --variables
 function _init()
 
-    music(0, 1000, 0)
+    music(3, 1000, 0)
 
     player = {
         sp = 2,

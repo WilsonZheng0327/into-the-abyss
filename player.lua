@@ -21,9 +21,9 @@ function player_update()
 
     --jump
     if btnp(⬆️) and player.landed then
+        sfx(12)
         player.dy-=player.boost
         player.landed=false
-        sfx(12)
     end
 
     --check collision
@@ -108,6 +108,8 @@ function player_update()
         cls(0)
         for j=1,30 do flip() end
         player.x=87*8 player.y=11*8
+        music(-1)
+        music(3,1000,0)
     end
 
     if collide_all_directions(3) and collide_all_directions(7) then
@@ -189,7 +191,7 @@ function die()
 
         reset_trial()
     end
-    music(0, 1000, 0)
+    music(3, 1000, 0)
 end
 
 function win()
