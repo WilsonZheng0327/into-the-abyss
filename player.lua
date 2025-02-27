@@ -42,9 +42,7 @@ function player_update()
         end
     elseif player.dy<0 then
         player.jumping=true
-        if collide_map(player,"up",1) then
-            player.dy=0
-        end
+        if collide_map(player,"up",1) then player.dy=0 end
     end
     
     if player.dx<0 then
@@ -66,6 +64,7 @@ function player_update()
         player.dead=true
     end
     
+    -- portal activation and entering
     if collide_all_directions(6) then
         player.on_portal=true
         if not player.portal_opened then
@@ -82,6 +81,7 @@ function player_update()
         end
     else player.on_portal=false end
 
+    -- activate trial
     if collide_all_directions(5) then
         player.on_switch=true
         if not player.in_trial then
@@ -102,6 +102,7 @@ function player_update()
         end
     else player.on_switch=false end
 
+    -- finish trial
     if collide_all_directions(4) then
         reset_trial()
         player.trial_finished=true
@@ -112,16 +113,24 @@ function player_update()
         music(3,1000,0)
     end
 
+    -- treasure chest
     if collide_all_directions(3) and collide_all_directions(7) then
         win()
     end
 
+    -- grave
+    if player.x>=32 and player.x<=44 and player.y>=120 and player.y<=128 then
+        player.can_interact=true
+        player.dialogue_id="grave"
+        if btnp(❎) then
+            player.in_dialogue=not player.in_dialogue
+        end
+    else player.can_interact=false end
+
     player.x+=player.dx
     player.y+=player.dy
 
-    if player.x<map_start_x then player.x=map_start_x end
-    if player.x>map_end_x-player.w then player.x=map_end_x-player.w end
-
+    -- no bounds checking needed
 end
 
 function player_animate()
@@ -133,14 +142,7 @@ function player_animate()
             player.sp+=1
             if player.sp>7 then player.sp=4 end
         end
-    else --idle
-        if time()-player.anim>.3 then
-            player.anim=time()
-            player.sp+=1
-            if player.sp>3 then player.sp=2 end
-        end
-        player.sp = 2
-    end
+    else player.sp = 2 end
 end
 
 -- helper function

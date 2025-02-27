@@ -22,6 +22,7 @@ function _init()
         falling=false,
         landed=false,
         vision_radius=32,
+
         tile_available=false,
         holding_tile=false,
         has_crown=false,
@@ -31,6 +32,10 @@ function _init()
         on_switch=false,
         in_trial=false,
         trial_finished=false,
+
+        can_interact=false,
+        dialogue_id="",
+        in_dialogue=false,
 
         dead=false,
         win=false,
@@ -177,10 +182,12 @@ function _update()
     end
 
     trial_animation_update()
-    if not player.holding_tile then 
+    if not player.holding_tile and not player.in_dialogue then 
         player_update() 
         if not player.trial_finished then arrow_update() end
     end
+    if player.in_dialogue and btnp(❎) then 
+        player.in_dialogue=false end
     player_animate()
     fog_update()
     check_object_collisions()
@@ -211,51 +218,58 @@ function _draw()
 
     if not player.trial_finished then arrow_draw() end
     spr(player.sp, player.x, player.y, 1, 1, player.flp)
-    spr(magic_tile_item.sp, magic_tile_item.x, magic_tile_item.y, 1, 1)
-    if player.tile_available then 
-        --indicator for having magic tile
-        rect(cam_x+1,cam_y+2,cam_x+10,cam_y+11, 8)
-        spr(18,cam_x+2,cam_y+2,1,1) 
-    end
+
     if player.holding_tile then
         print("placing...",cam_x+4,cam_y+118,7)
         print("🅾️ to confirm",cam_x+74,cam_y+112,7)
         print("❎ to cancel",cam_x+74,cam_y+118,7)
         spr(magic_cursor.sp,magic_cursor.x,magic_cursor.y,1,1)
         magic_cursor_update()
-    elseif player.tile_available and not player.holding_tile 
-    and not player.on_portal and not player.on_switch 
-    and not player.trial_finished then
+
+    elseif player.on_portal and player.has_layer2_key then
+        if not player.portal_opened then
+            print("❎ to activate portal...",cam_x+4,cam_y+118,7)
+        else print("❎ to enter...",cam_x+4,cam_y+118,7) end
+
+    elseif player.on_switch and not player.in_trial then
+        print("❎ to open the door... beware...",cam_x+4,cam_y+118,7)
+
+    elseif player.can_interact then
+        print("❎ to investigate...",cam_x+4,cam_y+118,7)
+
+    -- elseif player.in_dialogue then
+        -- handle_dialogue(player.dialogue_id)
+
+    elseif player.tile_available and not player.trial_finished then
         print("❎ to place magic tile...",cam_x+4,cam_y+118,7)
     end
 
-    if player.on_portal then
-        if player.has_layer2_key then
-            if not player.portal_opened then
-                print("❎ to activate portal...",cam_x+4,cam_y+118,7)
-            else
-                print("❎ to enter...",cam_x+4,cam_y+118,7)
-            end
-        end
-    end
+    -- elseif player.tile_available and not player.holding_tile 
+    -- and not player.on_portal and not player.on_switch 
+    -- and not player.trial_finished and not player.can_interact then
+    --     print("❎ to place magic tile...",cam_x+4,cam_y+118,7)
+    -- end
+
+    -- if player.on_portal then
+    --     if player.has_layer2_key then
+    --         if not player.portal_opened then
+    --             print("❎ to activate portal...",cam_x+4,cam_y+118,7)
+    --         else
+    --             print("❎ to enter...",cam_x+4,cam_y+118,7)
+    --         end
+    --     end
+    -- end
 
     if player.on_switch and not player.in_trial then
         print("❎ to open the door... beware...",cam_x+4,cam_y+118,7)
     end
 
+    spr(magic_tile_item.sp, magic_tile_item.x, magic_tile_item.y, 1, 1)
+    handle_indicator(player.tile_available,18,0,0)
     spr(crown_item.sp,crown_item.x,crown_item.y,1,1)
-    if player.has_crown then
-        --indicator for having crown
-        rect(cam_x+13,cam_y+2,cam_x+22,cam_y+11, 8)
-        spr(25,cam_x+14,cam_y+3,1,1) 
-    end
-
+    handle_indicator(player.has_crown,25,1,1)
     spr(key_item.sp,key_item.x,key_item.y,1,1)
-    if player.has_layer2_key then
-        --indicator for having layer 2 key
-        rect(cam_x+25,cam_y+2,cam_x+34,cam_y+11, 8)
-        spr(24,cam_x+26,cam_y+3,1,1) 
-    end
+    handle_indicator(player.has_layer2_key,24,2,1)
 
     if trial_animation.active then
         print("TRIAL ACTIVATING...", cam_x+4, cam_y+110, 8)
@@ -272,11 +286,15 @@ function _draw()
     -- rect(x1r, y1r, x2r, y2r, 7)
     -- print(tostr(player.portal_opened), player.x-16,player.y,7)
     -- print(key_item.sp, player.x-16,player.y+8,7)
-    -- if btnp(🅾️) then
-    --     print("yoyo",cam_x,cam_y,7)
-    -- end
-    -- print(arr_tile_count, cam_x,cam_y,7)
+    print(player.in_dialogue, cam_x,cam_y,7)
 
+end
+
+function handle_indicator(bool,item_spr,big_offset,y_offset)
+    if bool then
+        rect(cam_x+1+big_offset*12,cam_y+2,cam_x+10+big_offset*12,cam_y+11, 8)
+        spr(item_spr,cam_x+2+big_offset*12,cam_y+2+y_offset,1,1) 
+    end
 end
 
 function item_update(item, boolean)
@@ -291,4 +309,14 @@ function item_update(item, boolean)
     if dist > player.vision_radius then
         item.sp=16
     end
+end
+
+function handle_dialogue(id)
+    rectfill(cam_x+16, cam_y+48, cam_x+112, cam_y+72, 0)
+    rect(cam_x+16, cam_y+48, cam_x+112, cam_y+72, 7)
+    -- Message text
+    if id=="grave" then
+        print("Here lies something...", cam_x+20, cam_y+56, 7)
+    end
+    print("❎ to continue...", cam_x+20, cam_y+64, 7)
 end
