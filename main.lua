@@ -6,7 +6,7 @@ function _init()
     player = {
         sp = 2,
         -- x=32, y=8,
-        x=80*8,y=5*8,
+        x=102*8,y=26*8,
         w=8,
         h=8,
         flp=false, --flipped
@@ -23,15 +23,15 @@ function _init()
         landed=false,
         vision_radius=32,
 
-        tile_available=true,
+        tile_available=false,
         holding_tile=false,
-        has_crown=true,
+        has_crown=false,
         has_layer2_key=false,
         portal_opened=false,
         on_portal=false,
         on_switch=false,
         in_trial=false,
-        trial_finished=false,
+        trial_finished=true,
 
         can_interact=false,
         dialogue_id="",
@@ -173,10 +173,12 @@ function _update()
             player.has_layer2_key = false
             player.portal_opened = false
             player.trial_finished = false
+            player.win = true
             player.x = 32
             player.y = 8
             crown_item.sp=25
             original_map[crown_item.x/8][crown_item.y/8] = crown_item.sp
+            music(3,1000,0)
         end
         return
     end
@@ -188,7 +190,10 @@ function _update()
     end
 
     if player.can_interact then
-        if btnp(❎) then player.in_dialogue=not player.in_dialogue end
+        if btnp(❎) then player.in_dialogue=not player.in_dialogue 
+            if player.in_dialogue then sfx(19) end
+        end
+
     end
 
     player_animate()
@@ -300,23 +305,21 @@ function handle_dialogue(id)
     rect(cam_x+4, cam_y+96, cam_x+124, cam_y+124, 7)
     -- Message text
     if id=="grave" then
-        local m1="hERE lIES oNE wHO dREAMT oF"
-        local displayed = ""
-        for i=1, #m1 do
-            local char = sub(m1, i, i)
-            displayed = displayed .. char
-            print(displayed, cam_x+8, cam_y+100, 7)
-            for j=1,3 do flip() end
+        if player.win then
+            print("tHANKS fOR vISITING aGAIN...", cam_x+8, cam_y+100, 7)
+        else
+            print("hERE lIES oNE wHO dREAMT oF", cam_x+8, cam_y+100, 7)
+            print("rEACHING tHE tREASURE...", cam_x+8, cam_y+108, 7)
         end
-
-        local m2="rEACHING tHE tREASURE..."
-        local displayed = ""
-        for i=1, #m2 do
-            local char = sub(m2, i, i)
-            displayed = displayed .. char
-            print(displayed, cam_x+8, cam_y+108, 7)
-            for j=1,3 do flip() end
-        end
-        while player.in_dialogue do flip() end
+    elseif id=="cave_sign" then
+        print("lEGEND sAYS tHERE iS a cAVE", cam_x+8, cam_y+100, 7)
+        print(" bEHIND yOU...", cam_x+8, cam_y+108, 7)
+    elseif id=="jump_sign" then
+        print("lEGEND sAYS tRY pLACING tHE", cam_x+8, cam_y+100, 7)
+        print("mAGIC bLOCK wHILE jUMPING...", cam_x+8, cam_y+108, 7)
+    elseif id=="break_sign" then
+        print("lEGEND sAYS tHESE bLOCKS", cam_x+8, cam_y+100, 7)
+        print("mIGHT bE bREAKABLE...", cam_x+8, cam_y+108, 7)
+        print("tRY mAGIC...", cam_x+8, cam_y+116, 7)
     end
 end

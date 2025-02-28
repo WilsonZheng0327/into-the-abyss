@@ -122,6 +122,15 @@ function player_update()
     if player.x>=32 and player.x<=44 and player.y>=120 and player.y<=128 then
         player.can_interact=true
         player.dialogue_id="grave"
+    elseif player.x>=46*8 and player.x<=48*8 and player.y>=13*8 and player.y<=14*8 then
+        player.can_interact=true
+        player.dialogue_id="cave_sign"
+    elseif player.x>=53*8 and player.x<=55*8 and player.y>=30*8 and player.y<=31*8 then
+        player.can_interact=true
+        player.dialogue_id="jump_sign"
+    elseif player.x>=78*8 and player.x<=80*8 and player.y>=5*8 and player.y<=6*8 then
+        player.can_interact=true
+        player.dialogue_id="break_sign"
     else player.can_interact=false end
 
     player.x+=player.dx
@@ -195,6 +204,7 @@ end
 
 function win()
     cls(0)
+    music(-1)
     for j=1,30 do flip() end
     local m1 = "tHE oNE pIECE OF tREASURE"
     print(m1, cam_x+4, cam_y+44, 7)
