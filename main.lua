@@ -5,8 +5,8 @@ function _init()
 
     player = {
         sp = 2,
-        x=32, y=8,
-        -- x=96*8,y=26*8,
+        -- x=32, y=8,
+        x=80*8,y=5*8,
         w=8,
         h=8,
         flp=false, --flipped
@@ -23,9 +23,9 @@ function _init()
         landed=false,
         vision_radius=32,
 
-        tile_available=false,
+        tile_available=true,
         holding_tile=false,
-        has_crown=false,
+        has_crown=true,
         has_layer2_key=false,
         portal_opened=false,
         on_portal=false,
@@ -238,7 +238,6 @@ function _draw()
         print("❎ to open the door... beware...",cam_x+4,cam_y+118,7)
 
     elseif player.in_dialogue then
-        print("wtf?",cam_x+10,cam_y,7)
         handle_dialogue(player.dialogue_id)
 
     elseif player.can_interact then
@@ -258,7 +257,7 @@ function _draw()
 
     if trial_animation.active then
         print("TRIAL ACTIVATING...", cam_x+4, cam_y+110, 8)
-        -- Visual progress bar
+        -- visual progress bar
         rect(cam_x+4, cam_y+100, cam_x+124, cam_y+106, 5)
         local progress = (trial_animation.current_column - 80) / 48
         rectfill(cam_x+4, cam_y+100, cam_x+4+progress*120, cam_y+106, 8)
@@ -302,8 +301,22 @@ function handle_dialogue(id)
     -- Message text
     if id=="grave" then
         local m1="hERE lIES oNE wHO dREAMT oF"
-        for i=1,#m1 do print()
-        print("hERE lIES oNE wHO dREAMT oF", cam_x+8, cam_y+100, 7)
-        print("rEACHING tHE tREASURE...", cam_x+8, cam_y+108, 7)
+        local displayed = ""
+        for i=1, #m1 do
+            local char = sub(m1, i, i)
+            displayed = displayed .. char
+            print(displayed, cam_x+8, cam_y+100, 7)
+            for j=1,3 do flip() end
+        end
+
+        local m2="rEACHING tHE tREASURE..."
+        local displayed = ""
+        for i=1, #m2 do
+            local char = sub(m2, i, i)
+            displayed = displayed .. char
+            print(displayed, cam_x+8, cam_y+108, 7)
+            for j=1,3 do flip() end
+        end
+        while player.in_dialogue do flip() end
     end
 end

@@ -21,16 +21,16 @@ function tile_animate(available)
 end
 
 function magic_cursor_update() 
-    if btnp(⬆️) and magic_cursor.y>(max(map_start_y,player.y-player.vision_radius+8)) then
+    if btnp(⬆️) and magic_cursor.y>(max(map_start_y,player.y-player.vision_radius+16)) then
         magic_cursor.y-=8
     end
-    if btnp(⬇️) and magic_cursor.y<(max(map_start_y,player.y+player.vision_radius-8)) then
+    if btnp(⬇️) and magic_cursor.y<(max(map_start_y,player.y+player.vision_radius-16)) then
         magic_cursor.y+=8
     end
-    if btnp(⬅️) and magic_cursor.x>(max(map_start_x,player.x-player.vision_radius+8)) then
+    if btnp(⬅️) and magic_cursor.x>(max(map_start_x,player.x-player.vision_radius+16)) then
         magic_cursor.x-=8
     end
-    if btnp(➡️) and magic_cursor.x<(max(map_start_x,player.x+player.vision_radius-8)) then
+    if btnp(➡️) and magic_cursor.x<(max(map_start_x,player.x+player.vision_radius-16)) then
         magic_cursor.x+=8
     end
 end
@@ -71,15 +71,14 @@ function magic_tile_update()
             sfx(15)
 
             if fget(mget(magic_tile.x,magic_tile.y),3) then
+                -- break block
+                sfx(18)                
                 magic_tile.orig_sp=16
             else magic_tile.orig_sp=orig_sp end
 
             mset(magic_tile.x,magic_tile.y,magic_tile.sp)
             original_map[magic_tile.x][magic_tile.y]=magic_tile.sp --for fog  
 
-            if fget(mget(magic_tile.x,magic_tile.y),3) then
-                -- play sound effect?
-            end
-        end
+        else sfx(17) end
     end
 end

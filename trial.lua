@@ -1,7 +1,7 @@
 
 function start_trial()
     music(-1)
-    music(3, 500, 0)
+    music(0, 500, 0)
     -- backup
     original_map_backup = {}
     for i=80,127 do 
