@@ -122,9 +122,6 @@ function player_update()
     if player.x>=32 and player.x<=44 and player.y>=120 and player.y<=128 then
         player.can_interact=true
         player.dialogue_id="grave"
-        if btnp(❎) then
-            player.in_dialogue=not player.in_dialogue
-        end
     else player.can_interact=false end
 
     player.x+=player.dx

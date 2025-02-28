@@ -186,8 +186,11 @@ function _update()
         player_update() 
         if not player.trial_finished then arrow_update() end
     end
-    if player.in_dialogue and btnp(❎) then 
-        player.in_dialogue=false end
+
+    if player.can_interact then
+        if btnp(❎) then player.in_dialogue=not player.in_dialogue end
+    end
+
     player_animate()
     fog_update()
     check_object_collisions()
@@ -234,35 +237,17 @@ function _draw()
     elseif player.on_switch and not player.in_trial then
         print("❎ to open the door... beware...",cam_x+4,cam_y+118,7)
 
+    elseif player.in_dialogue then
+        print("wtf?",cam_x+10,cam_y,7)
+        handle_dialogue(player.dialogue_id)
+
     elseif player.can_interact then
         print("❎ to investigate...",cam_x+4,cam_y+118,7)
-
-    -- elseif player.in_dialogue then
-        -- handle_dialogue(player.dialogue_id)
 
     elseif player.tile_available and not player.trial_finished then
         print("❎ to place magic tile...",cam_x+4,cam_y+118,7)
     end
 
-    -- elseif player.tile_available and not player.holding_tile 
-    -- and not player.on_portal and not player.on_switch 
-    -- and not player.trial_finished and not player.can_interact then
-    --     print("❎ to place magic tile...",cam_x+4,cam_y+118,7)
-    -- end
-
-    -- if player.on_portal then
-    --     if player.has_layer2_key then
-    --         if not player.portal_opened then
-    --             print("❎ to activate portal...",cam_x+4,cam_y+118,7)
-    --         else
-    --             print("❎ to enter...",cam_x+4,cam_y+118,7)
-    --         end
-    --     end
-    -- end
-
-    if player.on_switch and not player.in_trial then
-        print("❎ to open the door... beware...",cam_x+4,cam_y+118,7)
-    end
 
     spr(magic_tile_item.sp, magic_tile_item.x, magic_tile_item.y, 1, 1)
     handle_indicator(player.tile_available,18,0,0)
@@ -286,7 +271,7 @@ function _draw()
     -- rect(x1r, y1r, x2r, y2r, 7)
     -- print(tostr(player.portal_opened), player.x-16,player.y,7)
     -- print(key_item.sp, player.x-16,player.y+8,7)
-    print(player.in_dialogue, cam_x,cam_y,7)
+    -- print(player.in_dialogue, cam_x,cam_y,7)
 
 end
 
@@ -312,11 +297,13 @@ function item_update(item, boolean)
 end
 
 function handle_dialogue(id)
-    rectfill(cam_x+16, cam_y+48, cam_x+112, cam_y+72, 0)
-    rect(cam_x+16, cam_y+48, cam_x+112, cam_y+72, 7)
+    rectfill(cam_x+4, cam_y+96, cam_x+124, cam_y+124, 0)
+    rect(cam_x+4, cam_y+96, cam_x+124, cam_y+124, 7)
     -- Message text
     if id=="grave" then
-        print("Here lies something...", cam_x+20, cam_y+56, 7)
+        local m1="hERE lIES oNE wHO dREAMT oF"
+        for i=1,#m1 do print()
+        print("hERE lIES oNE wHO dREAMT oF", cam_x+8, cam_y+100, 7)
+        print("rEACHING tHE tREASURE...", cam_x+8, cam_y+108, 7)
     end
-    print("❎ to continue...", cam_x+20, cam_y+64, 7)
 end
