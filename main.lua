@@ -178,6 +178,7 @@ function _update()
             player.y = 8
             crown_item.sp=25
             original_map[crown_item.x/8][crown_item.y/8] = crown_item.sp
+            music(-1,1000)
             music(3,1000,0)
         end
         return

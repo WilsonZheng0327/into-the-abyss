@@ -210,7 +210,8 @@ end
 
 function win()
     cls(0)
-    music(-1)
+    music(-1,2000)
+    music(11,3000,0)
     for j=1,30 do flip() end
     local m1 = "tHE oNE pIECE OF tREASURE"
     print(m1, cam_x+4, cam_y+44, 7)
