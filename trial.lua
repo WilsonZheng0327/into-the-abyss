@@ -74,7 +74,7 @@ function create_arrow(tile)
         x=tile.x*8+4,
         y=tile.y*8+8,
         w=2, h=6,
-        dy=2,
+        dy=3,
         sp = arr_sp,
         active = true
     }

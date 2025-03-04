@@ -67,17 +67,19 @@ function player_update()
     -- portal activation and entering
     if collide_all_directions(6) then
         player.on_portal=true
-        if not player.portal_opened then
-            if btnp(❎) then 
-                player.portal_opened=true
-                mset(4,25,34) mset(4,26,50) mset(5,25,35) mset(5,26,51)
-                original_map[4][25]=34
-                original_map[4][26]=50
-                original_map[5][25]=35
-                original_map[5][26]=51
+        if player.has_layer2_key then
+            if not player.portal_opened then
+                if btnp(❎) then 
+                    player.portal_opened=true
+                    mset(4,25,34) mset(4,26,50) mset(5,25,35) mset(5,26,51)
+                    original_map[4][25]=34
+                    original_map[4][26]=50
+                    original_map[5][25]=35
+                    original_map[5][26]=51
+                end
+            else
+                if btnp(❎) and player.x < 72*8 then tp_to_layer_3() end
             end
-        else
-            if btnp(❎) and player.x < 72*8 then tp_to_layer_3() end
         end
     else player.on_portal=false end
 
@@ -106,6 +108,7 @@ function player_update()
     if collide_all_directions(4) then
         reset_trial()
         player.trial_finished=true
+        player.in_trial=false
         cls(0)
         for j=1,30 do flip() end
         player.x=87*8 player.y=11*8
@@ -122,13 +125,16 @@ function player_update()
     if player.x>=32 and player.x<=44 and player.y>=120 and player.y<=128 then
         player.can_interact=true
         player.dialogue_id="grave"
-    elseif player.x>=46*8 and player.x<=48*8 and player.y>=13*8 and player.y<=14*8 then
+    elseif player.x>=45*8 and player.x<=48*8 and player.y>=13*8 and player.y<=14*8 then
         player.can_interact=true
         player.dialogue_id="cave_sign"
-    elseif player.x>=53*8 and player.x<=55*8 and player.y>=30*8 and player.y<=31*8 then
+    elseif player.x>=62*8 and player.x<=64*8 and player.y>=1*8 and player.y<=2*8 then
+        player.can_interact=true
+        player.dialogue_id="nothing_sign"
+    elseif player.x>=52*8 and player.x<=55*8 and player.y>=30*8 and player.y<=31*8 then
         player.can_interact=true
         player.dialogue_id="jump_sign"
-    elseif player.x>=78*8 and player.x<=80*8 and player.y>=5*8 and player.y<=6*8 then
+    elseif player.x>=77*8 and player.x<=80*8 and player.y>=5*8 and player.y<=6*8 then
         player.can_interact=true
         player.dialogue_id="break_sign"
     else player.can_interact=false end

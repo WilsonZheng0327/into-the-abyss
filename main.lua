@@ -6,7 +6,7 @@ function _init()
     player = {
         sp = 2,
         -- x=32, y=8,
-        x=102*8,y=26*8,
+        x=87*8,y=26*8,
         w=8,
         h=8,
         flp=false, --flipped
@@ -23,15 +23,15 @@ function _init()
         landed=false,
         vision_radius=32,
 
-        tile_available=false,
+        tile_available=true,
         holding_tile=false,
-        has_crown=false,
+        has_crown=true,
         has_layer2_key=false,
         portal_opened=false,
         on_portal=false,
         on_switch=false,
         in_trial=false,
-        trial_finished=true,
+        trial_finished=false,
 
         can_interact=false,
         dialogue_id="",
@@ -193,17 +193,16 @@ function _update()
         if btnp(❎) then player.in_dialogue=not player.in_dialogue 
             if player.in_dialogue then sfx(19) end
         end
-
+    elseif not player.on_portal and not player.on_switch 
+        and not player.trial_finished then
+            magic_tile_update()
     end
 
     player_animate()
     fog_update()
     check_object_collisions()
     magic_tile_item_update()
-    if not player.on_portal and not player.on_switch 
-    and not player.trial_finished then
-        magic_tile_update()
-    end
+
     item_update(key_item, player.has_layer2_key)
     item_update(crown_item, player.has_crown)
     
@@ -248,7 +247,8 @@ function _draw()
     elseif player.can_interact then
         print("❎ to investigate...",cam_x+4,cam_y+118,7)
 
-    elseif player.tile_available and not player.trial_finished then
+    elseif player.tile_available and not player.trial_finished 
+    and not player.on_portal then
         print("❎ to place magic tile...",cam_x+4,cam_y+118,7)
     end
 
@@ -309,14 +309,17 @@ function handle_dialogue(id)
             print("tHANKS fOR vISITING aGAIN...", cam_x+8, cam_y+100, 7)
         else
             print("hERE lIES oNE wHO dREAMT oF", cam_x+8, cam_y+100, 7)
-            print("rEACHING tHE tREASURE...", cam_x+8, cam_y+108, 7)
+            print("rEACHING tHE tREASURE", cam_x+8, cam_y+108, 7)
+            print("aT tHE bOTTOM...", cam_x+8, cam_y+116, 7)
         end
     elseif id=="cave_sign" then
         print("lEGEND sAYS tHERE iS a cAVE", cam_x+8, cam_y+100, 7)
-        print(" bEHIND yOU...", cam_x+8, cam_y+108, 7)
+        print("bEHIND yOU...", cam_x+8, cam_y+108, 7)
+    elseif id=="nothing_sign" then
+        print("lEGEND sAYS dEAD eND...", cam_x+8, cam_y+100, 7)
     elseif id=="jump_sign" then
         print("lEGEND sAYS tRY pLACING tHE", cam_x+8, cam_y+100, 7)
-        print("mAGIC bLOCK wHILE jUMPING...", cam_x+8, cam_y+108, 7)
+        print("mAGIC tILE wHILE jUMPING...", cam_x+8, cam_y+108, 7)
     elseif id=="break_sign" then
         print("lEGEND sAYS tHESE bLOCKS", cam_x+8, cam_y+100, 7)
         print("mIGHT bE bREAKABLE...", cam_x+8, cam_y+108, 7)
