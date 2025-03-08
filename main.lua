@@ -5,8 +5,8 @@ function _init()
 
     player = {
         sp = 2,
-        -- x=32, y=8,
-        x=87*8,y=26*8,
+        x=32, y=8,
+        -- x=87*8,y=26*8,
         w=8,
         h=8,
         flp=false, --flipped
@@ -23,9 +23,9 @@ function _init()
         landed=false,
         vision_radius=32,
 
-        tile_available=true,
+        tile_available=false,
         holding_tile=false,
-        has_crown=true,
+        has_crown=false,
         has_layer2_key=false,
         portal_opened=false,
         on_portal=false,
